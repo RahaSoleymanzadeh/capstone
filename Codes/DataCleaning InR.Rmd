@@ -1,0 +1,152 @@
+---
+title: "Real or Fake Job Posting[Data Cleaning]"
+author: "Raha"
+date: "01/06/2020"
+output: html_document
+---
+```{r}
+library(tidyr)
+library(zoo)
+library(countrycode)
+```
+```{r}
+FileName<- "[Real or Fake] Fake JobPosting Prediction.csv"
+
+# Load the csv file 
+df <- read.csv("fake_job_postings.csv" ,header = T)
+```
+```{r}
+dim(df)
+```
+```{r}
+sapply(df, class)
+```
+```{r}
+head(df)
+
+```
+```{r}
+sapply(df, function(x)length(unique(x)))
+```
+```{r}
+df2 <- df
+```
+```{r}
+df2 = subset(df2, select = -c(salary_range, job_id, department, benefits))
+```
+```{r}
+dim(df2)
+```
+```{r}
+head(df2)
+```
+```{r}
+df2 = df2[order(df2$title),]
+```
+```{r}
+head(df2)
+```
+```{r}
+rownames(df2) <- 1:nrow(df2)
+```
+```{r}
+head(df2)
+```
+```{r}
+df2[df2==""]<- NA
+```
+
+```{r}
+sapply(df2, function(x)sum(is.na(x)))
+```
+
+
+
+```{r}
+df2$employment_type = na.locf(na.locf(df2$employment_type), fromLast = TRUE)
+df2$required_experience = na.locf(na.locf(df2$required_experience), fromLast = TRUE)
+df2$required_education = na.locf(df2$required_education, fromLast = TRUE)
+df2$industry = na.locf(na.locf(df2$industry), fromLast = TRUE)
+df2$function.= na.locf(na.locf(df2$function.), fromLast = TRUE)
+
+```
+```{r}
+df3 <- df2
+```
+```{r}
+sapply(df3, function(x)sum(is.na(x)))
+```
+```{r}
+dim(df3)
+```
+```{r}
+df3=na.omit(df3)
+
+```
+```{r}
+df4= df3
+dim(df4)
+```
+```{r}
+df4= unique(df4)
+```
+```{r}
+head(df4)
+```
+```{r}
+dim(df4)
+```
+
+
+```{r}
+df4=unite(df4, description, requirements,company_profile, sep="***")
+```
+
+```{r}
+dim(df4)
+```
+```{r}
+head(df4)
+```
+
+```{r}
+df5=df4
+```
+
+```{r}
+df5<- df5 %>% separate(location,c("country","code","city"),sep = ",",extra = "merge")
+```
+```{r}
+head(df5)
+```
+
+
+```{r}
+df5$country= countrycode(df5$country,"iso2c","country.name")
+```
+
+
+```{r}
+head(df5)
+```
+
+```{r}
+df5 = subset(df5, select = -c(code))
+```
+```{r}
+dim(df5)
+```
+```{r}
+df5[df5==" "]<- NA
+sapply(df5, function(x)sum(is.na(x)))
+```
+```{r}
+df5= na.omit(df5)
+```
+```{r}
+dim(df5)
+```
+```{r}
+Df_clean<- df5
+```
+
